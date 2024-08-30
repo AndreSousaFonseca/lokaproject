@@ -6,3 +6,4 @@ torch
 bs4
 tqdm
 numpy
+python-dotenv
