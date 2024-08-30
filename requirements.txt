@@ -1,11 +1,17 @@
 aiofiles
 asyncio
 nest_asyncio
+sentence_transformers
+numpy
 transformers
 torch
+markdown
 bs4
-tqdm
-numpy
+nltk
+rouge_score 
+sklearn
 python-dotenv
+
+
 
 -e .
