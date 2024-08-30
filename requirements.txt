@@ -1,0 +1,11 @@
+aiofiles
+asyncio
+nest_asyncio
+transformers
+torch
+bs4
+re
+tqdm
+logging
+faiss
+numpy
