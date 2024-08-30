@@ -1,0 +1,8 @@
+README.md
+setup.py
+lokacode.egg-info/PKG-INFO
+lokacode.egg-info/SOURCES.txt
+lokacode.egg-info/dependency_links.txt
+lokacode.egg-info/requires.txt
+lokacode.egg-info/top_level.txt
+src/__init__.py
