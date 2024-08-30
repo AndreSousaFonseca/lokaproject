@@ -27,8 +27,14 @@ nest_asyncio.apply()
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 # Note loggings will not be commented
 
-# Preprocessing function to clean and structure markdown content
-def preprocess_markdown(content):   
+
+def preprocess_markdown(content):
+    """
+    Preprocess Markdown content to clean and structure it.
+    This includes converting Markdown to plain text, removing headers, 
+    and formatting HTTPS links.
+    """
+
     logging.info("Preprocessing markdown content") 
 
     # Inner function to format 'https' links in the text
@@ -59,8 +65,10 @@ def preprocess_markdown(content):
 ### Step1 : Load and chunk the Markdown files asynchronously ####
 #################################################################
 
-# Asynchronous function to process a markdown file and chunk its content
 async def process_md_file(file_path, chunk_size=512):
+    """
+    Asynchronously read and preprocess a Markdown file, then chunk the content.
+    """
     logging.info(f"Processing file: {file_path}")
     
     # Open the markdown file asynchronously in read mode with UTF-8 encoding
@@ -82,9 +90,10 @@ async def process_md_file(file_path, chunk_size=512):
      # Return the list of chunks
     return chunks
 
-
-# Asynchronous function to process all markdown files in a folder and chunk their content
 async def process_files(folder_path, chunk_size=512):
+    """
+    Asynchronously process all Markdown files in a folder and return their chunks.
+    """
     logging.info(f"Processing files in folder: {folder_path}")
     
     all_chunks = [] # List to store chunks from all files
@@ -119,6 +128,9 @@ async def process_files(folder_path, chunk_size=512):
 model = SentenceTransformer('all-MiniLM-L6-v2')
 
 def generate_embeddings(chunks):
+    """
+    Generate embeddings for a list of text chunks using the SentenceTransformer model.
+    """
     logging.info("Generating embeddings")
 
     # Generate embeddings for the list of text chunks using the SentenceTransformer model
@@ -134,8 +146,10 @@ def generate_embeddings(chunks):
 #######################################
 ### Step 3: Create the FAISS index ####
 #######################################
-# Create FAISS index based on model embeddings
 def create_faiss_index(embeddings):
+    """
+    Create a FAISS index from the given embeddings.
+    """
     logging.info("Creating FAISS index")
     
     # Convert the list of embeddings to a NumPy array of type float32
@@ -155,8 +169,11 @@ def create_faiss_index(embeddings):
     # Return the created FAISS index
     return index
 
-# obtain distances and corresponding indices
+
 def search_index(index, query_embeddings, k=5):
+    """
+    Search the FAISS index for the top k nearest neighbors of the query embeddings.
+    """
     logging.info(f"Searching index for top {k} results")
 
     # Perform the search on the FAISS index with the query embeddings
@@ -168,8 +185,11 @@ def search_index(index, query_embeddings, k=5):
     # Log the completion of the search
     return distances, indices
 
-# Rebuild the FAISS index
+
 def rebuild_index(folder_path, chunk_size=512):
+    """
+    Rebuild the FAISS index by processing files in the specified folder and generating embeddings.
+    """
     logging.info("Rebuilding FAISS index")
 
     # Process all markdown files in the specified folder, chunking the content
@@ -236,8 +256,11 @@ Question: {question}
 Answer:
 """
 
-# Find and return a list of synonyms for a given word 
+
 def get_synonyms(word):
+    """
+    Retrieve synonyms for a given word using WordNet.
+    """
     # Initialize an empty set to store synonyms
     synonyms = set()
 
@@ -251,8 +274,10 @@ def get_synonyms(word):
     # Return the list of synonyms
     return list(synonyms)
 
-# Handle ut-of-vocabulary (OOV) terms based on synonyms
 def handle_oov_terms(question, known_terms):
+    """
+    Handle out-of-vocabulary terms in the question by replacing them with synonyms.
+    """
     # Split the question into individual words
     words = question.split()
     
@@ -279,8 +304,10 @@ def handle_oov_terms(question, known_terms):
     return ' '.join(new_words)
 
 
-# Generating an answer to a question based on relevant documents and known terms.
 def generate_answer(question, relevant_docs, known_terms):
+    """
+    Generate an answer to the question using the GPT model and relevant documentation.
+    """
     logging.info(f"Generating answer for question: {question}")
 
     # Handle Out-of-Vocabulary (OOV) terms in the question by replacing them with synonyms
@@ -327,8 +354,10 @@ def generate_answer(question, relevant_docs, known_terms):
     return answer
 
 
-# Retrieve ROUGE score
 def evaluate_rouge(generated_answer, reference_answer):
+    """
+    Evaluate the generated answer against a reference answer using ROUGE scores.
+    """
      # Initialize a RougeScorer object to compute ROUGE scores (ROUGE-1 and ROUGE-L) with stemming
     scorer = rouge_scorer.RougeScorer(['rouge1', 'rougeL'], use_stemmer=True)
 
@@ -341,6 +370,9 @@ def evaluate_rouge(generated_answer, reference_answer):
 
 # Retrieve cosine similarity score
 def evaluate_cosine_similarity(generated_answer, reference_answer):
+    """
+    Evaluate the cosine similarity between the generated answer and a reference answer.
+    """
     # Create a CountVectorizer to convert the text into a matrix of token counts
     vectorizer = CountVectorizer().fit_transform([generated_answer, reference_answer])
 
@@ -354,9 +386,11 @@ def evaluate_cosine_similarity(generated_answer, reference_answer):
     return cosine_sim[0, 1]  
 
 
-
-
 def main_search_and_answer(index, chunks, query, k=5, reference_answer=""):
+    """
+    Perform a search in the FAISS index and generate an answer to the query.
+    Evaluate the answer using ROUGE and cosine similarity metrics.
+    """
     logging.info(f"Starting search and answer generation for query: {query}")
 
     # Treat the query itself as a chunk for generating embeddings
@@ -394,7 +428,11 @@ def main_search_and_answer(index, chunks, query, k=5, reference_answer=""):
     # Return the generated answer along with evaluation score
     return answer, rouge_scores, cosine_sim
 
-# Example usage
+
+#####################
+### Example usage ###
+#####################
+
 # Define the path to the folder containing the markdown files
 folder_path = FILE_PATH
 
