@@ -368,7 +368,6 @@ def evaluate_rouge(generated_answer, reference_answer):
     return scores
 
 
-# Retrieve cosine similarity score
 def evaluate_cosine_similarity(generated_answer, reference_answer):
     """
     Evaluate the cosine similarity between the generated answer and a reference answer.
